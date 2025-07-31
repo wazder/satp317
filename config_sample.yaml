@@ -1,0 +1,86 @@
+# Airport Surveillance System Configuration Sample
+# Copy this file to config_custom.yaml and modify as needed
+
+# Video Processing Settings
+video:
+  input_fps: 30                    # Original video FPS
+  target_fps: 15                   # Processing FPS (lower = faster)
+  resolution: [1920, 1080]         # Target resolution
+  output_format: "mp4"             # Output video format
+
+# Model Configuration
+models:
+  yolo_model: "yolov8n.pt"         # YOLO model (n/s/m/l/x)
+  sam_checkpoint: "sam_vit_h_4b8939.pth"  # SAM model weights
+  sam_model_type: "vit_h"          # SAM model type
+  yolo_confidence: 0.5             # Detection confidence threshold
+  yolo_iou_threshold: 0.45         # YOLO NMS IoU threshold
+  sam_iou_threshold: 0.5           # SAM-YOLO matching IoU threshold
+
+# Object Tracking Settings
+tracking:
+  tracker_type: "deepsort"         # "deepsort" or "bytetrack"
+  max_age: 30                      # Max frames to keep lost tracks
+  min_hits: 3                      # Min detections before confirmed
+  iou_threshold: 0.3               # Tracking IoU threshold
+
+# Region of Interest (ROI) Settings
+roi:
+  roi_type: "polygon"              # "polygon" or "rectangle"
+  # ROI coordinates (x, y) for 1080p video
+  roi_points:
+    - [400, 300]                   # Top-left
+    - [1520, 300]                  # Top-right
+    - [1520, 780]                  # Bottom-right
+    - [400, 780]                   # Bottom-left
+  line_thickness: 3                # ROI border thickness
+  color: [0, 255, 0]              # ROI color (BGR)
+
+# Visualization Settings
+visualization:
+  show_yolo_boxes: true            # Show YOLO detections
+  show_sam_masks: true             # Show SAM masks
+  show_tracking_ids: true          # Show object IDs
+  show_roi: true                   # Show ROI area
+  show_object_info: true           # Show color/size info
+  mask_alpha: 0.3                  # Mask transparency
+  font_scale: 0.6                  # Text size
+  font_thickness: 2                # Text thickness
+
+# Logging Settings
+logging:
+  output_csv: true                 # Export CSV logs
+  output_json: true                # Export JSON logs
+  log_features: true               # Include color/size features
+  log_roi_events: true             # Log ROI crossings
+
+# Target Object Classes
+target_classes:
+  - "person"
+  - "backpack" 
+  - "handbag"
+  - "suitcase"
+
+# COCO Class ID Mapping
+target_class_ids:
+  person: 0
+  backpack: 24
+  handbag: 26
+  suitcase: 28
+
+# Performance Optimization
+performance:
+  use_half_precision: true         # Use FP16 for speed
+  batch_size: 1                    # Processing batch size
+  num_workers: 4                   # Data loading workers
+  pin_memory: true                 # Pin GPU memory
+
+# Advanced Settings
+advanced:
+  enable_mask_refinement: false    # Post-process SAM masks
+  color_clustering_k: 3            # K-means clusters for color
+  size_categories:                 # Size thresholds (pixels)
+    very_small: 1000
+    small: 5000
+    medium: 20000
+    large: 50000
