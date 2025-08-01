@@ -1,0 +1,74 @@
+# Video files (too large for GitHub)
+*.mp4
+*.avi
+*.mov
+*.mkv
+*.wmv
+*.flv
+*.webm
+
+# Model weights (large files)
+weights/*.pth
+weights/*.pt
+weights/*.onnx
+weights/*.engine
+
+# Output files
+data/output/*
+data/logs/*
+
+# Keep directory structure but ignore contents
+data/input/*
+!data/input/.gitkeep
+data/output/*
+!data/output/.gitkeep
+data/logs/*
+!data/logs/.gitkeep
+weights/*
+!weights/.gitkeep
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+*.egg-info/
+dist/
+build/
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Environment files
+.env
+.venv
+venv/
+ENV/
+
+# Temporary files
+*.tmp
+*.temp
+*.log
+
+# Large datasets
+*.zip
+*.tar.gz
+*.rar

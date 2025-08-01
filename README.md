@@ -54,13 +54,21 @@ A comprehensive offline video analytics system for airport surveillance that det
 
 ### Basic Usage
 
-1. **Place your video in the input directory**
+1. **Get a test video**
    ```bash
+   # Download the provided test video
+   wget --no-check-certificate 'https://drive.google.com/uc?export=download&id=1OYdAf3OMYIFLnGAi8Gx9an_xv3BulPpN' -O data/input/test_video.mp4
+   
+   # OR place your own video
    cp your_video.mp4 data/input/
    ```
 
 2. **Run the surveillance system**
    ```bash
+   # With test video
+   python main.py data/input/test_video.mp4
+   
+   # With your own video
    python main.py data/input/your_video.mp4
    ```
 
@@ -89,17 +97,17 @@ Options:
 
 **High-quality processing:**
 ```bash
-python main.py airport_video.mp4 --fps 30 --yolo-model yolov8l.pt --confidence 0.7
+python main.py data/input/test_video.mp4 --fps 30 --yolo-model yolov8l.pt --confidence 0.7
 ```
 
 **Fast processing (CPU-friendly):**
 ```bash
-python main.py video.mp4 --fps 10 --disable-sam --confidence 0.4
+python main.py data/input/test_video.mp4 --fps 10 --disable-sam --confidence 0.4
 ```
 
 **Custom ROI:**
 ```bash
-python main.py video.mp4 --roi-points "100,200,800,200,800,600,100,600"
+python main.py data/input/test_video.mp4 --roi-points "100,200,800,200,800,600,100,600"
 ```
 
 ### Configuration
@@ -286,6 +294,42 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 3. Make your changes
 4. Add tests and documentation
 5. Submit a pull request
+
+## 🖥️ Running on Vast.ai (Cloud GPU)
+
+### Quick Cloud Setup:
+
+1. **Launch Vast.ai instance** with RTX 4090/3090 (8GB+ VRAM)
+2. **Access via Jupyter Lab** (use the provided HTTP link)
+3. **Open terminal in Jupyter** and run:
+
+```bash
+# Clone project
+git clone https://github.com/wazder/satp317.git
+cd satp317
+
+# Install dependencies
+pip install -r requirements.txt
+python setup.py
+
+# Download test video
+wget --no-check-certificate 'https://drive.google.com/uc?export=download&id=1OYdAf3OMYIFLnGAi8Gx9an_xv3BulPpN' -O data/input/test_video.mp4
+
+# Run surveillance system
+python main.py data/input/test_video.mp4 --fps 15 --confidence 0.6
+
+# Monitor progress (in another terminal)
+watch -n 1 nvidia-smi
+```
+
+4. **Download results** via Jupyter file browser:
+   - `data/output/debug_output.mp4` (annotated video)
+   - `data/output/roi_events.csv` (event logs)
+
+### Performance Tips for Cloud:
+- **RTX 4090**: Use `--fps 30 --yolo-model yolov8l.pt`
+- **RTX 3080**: Use `--fps 15 --yolo-model yolov8m.pt`  
+- **Budget mode**: Use `--fps 10 --disable-sam`
 
 ## 📞 Support
 
