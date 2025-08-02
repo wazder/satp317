@@ -372,7 +372,10 @@ class AirportSurveillanceSystem:
             return True
             
         except Exception as e:
+            import traceback
             print(f"Error during processing: {e}")
+            print("Full traceback:")
+            traceback.print_exc()
             return False
         
         finally:
