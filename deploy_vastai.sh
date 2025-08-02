@@ -32,11 +32,22 @@ pip install -r requirements.txt
 echo "📁 Creating directories..."
 mkdir -p data/{input,output,logs} weights
 
-# Download sample video if needed
-echo "📹 Setting up test video..."
+# Download test video from Google Drive
+echo "📹 Downloading test video from Google Drive..."
 if [ ! -f "data/input/test_video.mp4" ]; then
-    echo "Downloading sample video..."
-    wget -q --no-check-certificate 'https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_1mb.mp4' -O data/input/test_video.mp4 || echo "⚠️  Sample video download failed"
+    echo "Downloading surveillance test video..."
+    # Convert Google Drive share link to direct download link
+    FILE_ID="1OYdAf3OMYIFLnGAi8Gx9an_xv3BulPpN"
+    wget --no-check-certificate "https://drive.google.com/uc?export=download&id=${FILE_ID}" -O data/input/test_video.mp4
+    
+    if [ -f "data/input/test_video.mp4" ]; then
+        echo "✅ Test video downloaded successfully"
+        # Check file size
+        FILE_SIZE=$(stat -f%z "data/input/test_video.mp4" 2>/dev/null || stat -c%s "data/input/test_video.mp4" 2>/dev/null || echo "0")
+        echo "   File size: $(($FILE_SIZE / 1024 / 1024)) MB"
+    else
+        echo "⚠️  Video download failed - you can upload manually to data/input/"
+    fi
 fi
 
 # GPU Check
@@ -65,10 +76,9 @@ except Exception as e:
 "
 
 echo ""
-echo "🎯 Setup complete! Ready to run surveillance system."
+echo "🎯 Setup complete! Ready to run Airport Surveillance System!"
 echo ""
 echo "Quick start commands:"
-echo "  cd satp317"
 echo ""
 echo "💡 For RTX 4090/3090 (High performance):"
 echo "  python main.py data/input/test_video.mp4 --fps 30 --confidence 0.3"
@@ -83,3 +93,8 @@ echo "📊 Monitor GPU usage:"
 echo "  watch -n 1 nvidia-smi"
 echo ""
 echo "📁 Results will be in: data/output/"
+echo "   - debug_output.mp4 (processed video)"
+echo "   - *.csv files (detection logs)"
+echo ""
+echo "🔄 If video download failed, run:"
+echo "  bash download_test_video.sh"
