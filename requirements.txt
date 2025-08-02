@@ -23,8 +23,8 @@ scikit-learn>=1.3.0
 
 # Object tracking
 filterpy>=1.4.5
-deep-sort-realtime>=1.3.2
-bytetrack>=0.3.0
+# deep-sort-realtime>=1.3.2  # Replaced with supervision's ByteTracker
+# bytetrack>=0.3.0  # Available in supervision
 
 # Visualization and progress
 matplotlib>=3.7.0
