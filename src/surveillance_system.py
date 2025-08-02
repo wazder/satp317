@@ -35,7 +35,7 @@ except ImportError:
     LINELOGIC_AVAILABLE = False
 
 class AirportSurveillanceSystem:
-    def __init__(self, input_video_path: str, output_dir: str = "data/output", use_linelogic: bool = True):
+    def __init__(self, input_video_path: str, output_dir: str = "data/output", use_linelogic: bool = True, use_adaptive_system: bool = False, target_accuracy: float = 0.90):
         self.input_video_path = input_video_path
         self.output_dir = Path(output_dir)
         self.output_dir.mkdir(parents=True, exist_ok=True)
@@ -219,7 +219,10 @@ class AirportSurveillanceSystem:
     def process_frame_basic(self, frame: np.ndarray, frame_number: int) -> np.ndarray:
         """Process frame using basic surveillance pipeline."""
         # 1. SAM - Full image segmentation
-        sam_masks, sam_boxes = self.sam_segmentor.segment_frame(frame)
+        if self.sam_segmentor:
+            sam_masks, sam_boxes = self.sam_segmentor.segment_frame(frame)
+        else:
+            sam_masks, sam_boxes = [], []
         
         # 2. YOLO Detection
         yolo_detections = self.yolo_detector.detect(frame)
