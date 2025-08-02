@@ -63,7 +63,7 @@ class FeatureExtractor:
             # Get pixels within mask
             masked_pixels = frame[mask > 0]
             
-            if len(masked_pixels) == 0:
+            if masked_pixels.size == 0:
                 return {'color_name': 'unknown', 'rgb': (0, 0, 0), 'confidence': 0.0}
             
             # Convert BGR to RGB
@@ -159,7 +159,7 @@ class FeatureExtractor:
         
         # Get bounding box dimensions
         coords = np.where(mask > 0)
-        if len(coords[0]) == 0:
+        if coords[0].size == 0:
             return {
                 'pixel_area': 0,
                 'width': 0,
