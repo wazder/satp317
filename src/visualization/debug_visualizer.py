@@ -75,13 +75,23 @@ class DebugVisualizer:
         
         return debug_frame
     
-    def _draw_roi(self, frame: np.ndarray, roi_polygon: List[Tuple[int, int]]) -> np.ndarray:
+    def _draw_roi(self, frame: np.ndarray, roi_polygon) -> np.ndarray:
         """Draw ROI polygon on frame."""
-        if not roi_polygon:
+        # Handle both numpy arrays and lists
+        if roi_polygon is None:
+            return frame
+        
+        # Convert to numpy array if it's a list
+        if isinstance(roi_polygon, list):
+            roi_points = np.array(roi_polygon, np.int32)
+        else:
+            roi_points = roi_polygon
+        
+        # Check if roi_points is empty
+        if roi_points.size == 0 or len(roi_points) == 0:
             return frame
         
         # Draw ROI polygon
-        roi_points = np.array(roi_polygon, np.int32)
         cv2.polylines(frame, [roi_points], True, config.roi.color, config.roi.line_thickness)
         
         # Fill with semi-transparent color
@@ -91,7 +101,7 @@ class DebugVisualizer:
         
         # Add ROI label
         cv2.putText(frame, "ROI", 
-                   (roi_polygon[0][0], roi_polygon[0][1] - 10),
+                   (roi_points[0][0], roi_points[0][1] - 10),
                    self.font, 0.7, config.roi.color, 2)
         
         return frame
