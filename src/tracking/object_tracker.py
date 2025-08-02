@@ -18,7 +18,6 @@ class ObjectTracker:
         if not detections:
             return []
         
-        # Convert to supervision format
         detection_list = []
         confidences = []
         class_ids = []
@@ -28,7 +27,7 @@ class ObjectTracker:
             x1, y1, x2, y2 = bbox
             detection_list.append([x1, y1, x2, y2])
             confidences.append(det['confidence'])
-            class_ids.append(0)  # Default class
+            class_ids.append(0)
         
         if detection_list:
             detections_sv = sv.Detections(
@@ -37,13 +36,17 @@ class ObjectTracker:
                 class_id=np.array(class_ids)
             )
             
-            # Update tracker
             detections_sv = self.tracker.update_with_detections(detections_sv)
             
-            # Convert back to our format
             tracked_objects = []
             for i, det in enumerate(detections):
-                det['track_id'] = int(detections_sv.tracker_id[i]) if i < len(detections_sv.tracker_id) else -1
+                if hasattr(detections_sv, 'tracker_id') and i < len(detections_sv.tracker_id):
+                    try:
+                        det['track_id'] = int(detections_sv.tracker_id[i])
+                    except (ValueError, TypeError):
+                        det['track_id'] = -1
+                else:
+                    det['track_id'] = -1
                 tracked_objects.append(det)
             
             return tracked_objects
