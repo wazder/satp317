@@ -234,8 +234,9 @@ class AirportSurveillanceSystem:
         
         # 4. Extract features from matched masks
         for obj in matched_objects:
-            if obj['mask'] is not None:
-                features = self.feature_extractor.extract_features(frame, obj['mask'])
+            mask = obj.get('mask')
+            if mask is not None and hasattr(mask, 'shape') and mask.size > 0:
+                features = self.feature_extractor.extract_features(frame, mask)
                 obj.update(features)
         
         # 5. Object tracking
