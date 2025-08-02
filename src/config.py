@@ -1,5 +1,5 @@
 import os
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import List, Tuple, Dict
 
 @dataclass
@@ -33,15 +33,15 @@ class TrackingConfig:
 @dataclass
 class ROIConfig:
     roi_type: str = "polygon"  # or "rectangle" or "lines" for LineLogic
-    roi_points: List[Tuple[int, int]] = None
+    roi_points: List[Tuple[int, int]] = field(default=None)
     line_thickness: int = 3
     color: Tuple[int, int, int] = (0, 255, 0)
     
     # LineLogic line crossing configuration
     use_line_crossing: bool = True
-    line_positions: List[int] = None  # X coordinates for vertical lines
+    line_positions: List[int] = field(default=None)  # X coordinates for vertical lines
     line_height: int = 1080
-    line_ids: List[int] = None
+    line_ids: List[int] = field(default=None)
 
 @dataclass
 class VisualizationConfig:
@@ -80,17 +80,17 @@ class LineLogicConfig:
 
 @dataclass
 class Config:
-    video: VideoConfig = VideoConfig()
-    models: ModelConfig = ModelConfig()
-    tracking: TrackingConfig = TrackingConfig()
-    roi: ROIConfig = ROIConfig()
-    visualization: VisualizationConfig = VisualizationConfig()
-    logging: LoggingConfig = LoggingConfig()
-    linelogic: LineLogicConfig = LineLogicConfig()
+    video: VideoConfig = field(default_factory=VideoConfig)
+    models: ModelConfig = field(default_factory=ModelConfig)
+    tracking: TrackingConfig = field(default_factory=TrackingConfig)
+    roi: ROIConfig = field(default_factory=ROIConfig)
+    visualization: VisualizationConfig = field(default_factory=VisualizationConfig)
+    logging: LoggingConfig = field(default_factory=LoggingConfig)
+    linelogic: LineLogicConfig = field(default_factory=LineLogicConfig)
     
     # Target classes for YOLO detection
-    target_classes: List[str] = None
-    target_class_ids: Dict[str, int] = None
+    target_classes: List[str] = field(default=None)
+    target_class_ids: Dict[str, int] = field(default=None)
     
     # Mode selection
     use_linelogic_mode: bool = True
