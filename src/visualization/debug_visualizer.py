@@ -30,7 +30,8 @@ class DebugVisualizer:
                        sam_masks: List[np.ndarray],
                        tracked_objects: List[Dict],
                        roi_polygon: List[Tuple[int, int]],
-                       roi_events: List[Dict]) -> np.ndarray:
+                       roi_events: List[Dict],
+                       **kwargs) -> np.ndarray:
         """
         Draw comprehensive debug information on frame.
         
@@ -67,9 +68,10 @@ class DebugVisualizer:
         if roi_events:
             debug_frame = self._draw_roi_events(debug_frame, roi_events)
         
-        # 6. Draw info panel
+        # 6. Draw info panel (with accuracy metrics if available)
+        accuracy_metrics = kwargs.get('accuracy_metrics', None)
         debug_frame = self._draw_info_panel(debug_frame, yolo_detections, 
-                                           tracked_objects, roi_events)
+                                           tracked_objects, roi_events, accuracy_metrics)
         
         return debug_frame
     
@@ -224,13 +226,14 @@ class DebugVisualizer:
     def _draw_info_panel(self, frame: np.ndarray, 
                         yolo_detections: List[Dict],
                         tracked_objects: List[Dict],
-                        roi_events: List[Dict]) -> np.ndarray:
-        """Draw information panel with statistics."""
+                        roi_events: List[Dict],
+                        accuracy_metrics: Dict = None) -> np.ndarray:
+        """Draw information panel with statistics and accuracy metrics."""
         height, width = frame.shape[:2]
         
         # Create info panel background
-        panel_height = 120
-        panel_width = 300
+        panel_height = 160 if accuracy_metrics else 120
+        panel_width = 350
         panel_x = width - panel_width - 10
         panel_y = 10
         
@@ -248,7 +251,7 @@ class DebugVisualizer:
         
         # Add statistics text
         y_offset = panel_y + 25
-        line_height = 20
+        line_height = 18
         
         info_lines = [
             f"YOLO Detections: {len(yolo_detections)}",
@@ -258,10 +261,56 @@ class DebugVisualizer:
             f"Classes: {', '.join(config.target_classes)}"
         ]
         
+        # Add accuracy metrics if available
+        if accuracy_metrics:
+            info_lines.extend([
+                "--- Accuracy Metrics ---",
+                f"Detection Rate: {accuracy_metrics.get('accuracy_rate', 0):.1%}",
+                f"Enhanced: {accuracy_metrics.get('enhancement_rate', 0):.1%}",
+                f"Filtered FP: {accuracy_metrics.get('filtering_rate', 0):.1%}"
+            ])
+        
         for line in info_lines:
+            # Use different color for accuracy section
+            color = (100, 255, 100) if "Accuracy" in line or "Detection Rate" in line or "Enhanced" in line or "Filtered" in line else (255, 255, 255)
+            font_scale = 0.35 if "---" in line else 0.4
+            
             cv2.putText(frame, line, (panel_x + 10, y_offset), 
-                       self.font, 0.4, (255, 255, 255), 1)
+                       self.font, font_scale, color, 1)
             y_offset += line_height
+        
+        return frame
+    
+    def draw_bottom_accuracy_overlay(self, frame: np.ndarray, accuracy_text: str) -> np.ndarray:
+        """Draw accuracy information at bottom of frame with semi-transparent background."""
+        height, width = frame.shape[:2]
+        
+        # Calculate text size
+        font_scale = 0.8
+        thickness = 2
+        text_size = cv2.getTextSize(accuracy_text, self.font, font_scale, thickness)[0]
+        
+        # Position at bottom center
+        text_x = (width - text_size[0]) // 2
+        text_y = height - 30
+        
+        # Draw semi-transparent background
+        padding = 15
+        bg_x1 = text_x - padding
+        bg_y1 = text_y - text_size[1] - padding
+        bg_x2 = text_x + text_size[0] + padding
+        bg_y2 = text_y + padding
+        
+        overlay = frame.copy()
+        cv2.rectangle(overlay, (bg_x1, bg_y1), (bg_x2, bg_y2), (0, 0, 0), -1)
+        cv2.addWeighted(frame, 0.7, overlay, 0.3, 0, frame)
+        
+        # Draw border
+        cv2.rectangle(frame, (bg_x1, bg_y1), (bg_x2, bg_y2), (100, 255, 100), 2)
+        
+        # Draw text
+        cv2.putText(frame, accuracy_text, (text_x, text_y), 
+                   self.font, font_scale, (100, 255, 100), thickness)
         
         return frame
     

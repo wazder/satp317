@@ -46,10 +46,11 @@ class ROIManager:
                 if is_in_roi:
                     events.append({
                         'track_id': track_id,
-                        'event_type': 'entry',
-                        'frame': frame_number,
-                        'position': center_point,
-                        'class': obj.get('class', 'unknown'),
+                        'event_type': 'ENTER',
+                        'frame_number': frame_number,
+                        'center': center_point,
+                        'bbox': bbox,
+                        'object_class': obj.get('class', 'unknown'),
                         'confidence': obj.get('confidence', 0.0)
                     })
             else:
@@ -57,13 +58,14 @@ class ROIManager:
                 prev_state = self.object_states[track_id]['in_roi']
                 
                 if prev_state != is_in_roi:
-                    event_type = 'entry' if is_in_roi else 'exit'
+                    event_type = 'ENTER' if is_in_roi else 'EXIT'
                     events.append({
                         'track_id': track_id,
                         'event_type': event_type,
-                        'frame': frame_number,
-                        'position': center_point,
-                        'class': obj.get('class', 'unknown'),
+                        'frame_number': frame_number,
+                        'center': center_point,
+                        'bbox': bbox,
+                        'object_class': obj.get('class', 'unknown'),
                         'confidence': obj.get('confidence', 0.0)
                     })
                 

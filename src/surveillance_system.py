@@ -23,6 +23,7 @@ from .utils.roi_manager import ROIManager
 from .utils.feature_extractor import FeatureExtractor
 from .utils.logger import EventLogger
 from .visualization.debug_visualizer import DebugVisualizer
+from .accuracy_enhancer import AccuracyEnhancer
 
 # Import LineLogic components
 try:
@@ -85,6 +86,7 @@ class AirportSurveillanceSystem:
         self.feature_extractor = FeatureExtractor()
         self.event_logger = EventLogger(self.output_dir)
         self.debug_visualizer = DebugVisualizer()
+        self.accuracy_enhancer = AccuracyEnhancer()
     
     def setup_linelogic(self):
         """Setup LineLogic specific configurations."""
@@ -239,20 +241,28 @@ class AirportSurveillanceSystem:
         # 5. Object tracking
         tracked_objects = self.object_tracker.update(matched_objects, frame_number)
         
-        # 6. ROI event detection and logging
-        roi_events = self.roi_manager.check_roi_crossings(tracked_objects, frame_number)
+        # 6. Accuracy enhancement
+        enhanced_objects, accuracy_metrics = self.accuracy_enhancer.enhance_detections(tracked_objects, frame_number)
+        
+        # 7. ROI event detection and logging
+        roi_events = self.roi_manager.check_roi_crossings(enhanced_objects, frame_number)
         if roi_events:
             self.event_logger.log_events(roi_events, frame_number / config.video.target_fps)
         
-        # 7. Debug visualization
+        # 8. Debug visualization
         debug_frame = self.debug_visualizer.draw_debug_info(
             frame.copy(),
             yolo_detections,
             sam_masks,
-            tracked_objects,
+            enhanced_objects,
             self.roi_manager.roi_polygon,
-            roi_events
+            roi_events,
+            accuracy_metrics=accuracy_metrics
         )
+        
+        # 9. Add accuracy overlay at bottom
+        accuracy_text = f"Detection Accuracy: {accuracy_metrics.get('accuracy_rate', 0):.1%} | Enhanced: {accuracy_metrics.get('enhancement_rate', 0):.1%} | Filtered FP: {accuracy_metrics.get('filtering_rate', 0):.1%}"
+        debug_frame = self.debug_visualizer.draw_bottom_accuracy_overlay(debug_frame, accuracy_text)
         
         return debug_frame
     
@@ -330,7 +340,7 @@ class AirportSurveillanceSystem:
                     continue
                 
                 # Process frame
-                debug_frame = self.process_frame(frame, self.processed_frames)
+                debug_frame = self.process_frame(frame, frame_number)
                 
                 # Write output frame
                 self.out.write(debug_frame)

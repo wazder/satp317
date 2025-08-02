@@ -41,7 +41,6 @@ class DetectionResult:
     validation_score: float = 0.0
     final_confidence: float = 0.0
     source_model: str = ""
-    frame_number: int = 0
 
 @dataclass
 class SystemMetrics:
@@ -285,8 +284,7 @@ class AdaptiveSystemAnything:
             confidence=final_confidence,
             tracker_id=None,  # Will be assigned by tracker
             ensemble_score=model_agreement,
-            source_model=f"ensemble_{len(detection_group)}",
-            frame_number=self.frame_count
+            source_model=f"ensemble_{len(detection_group)}"
         )
         
         return detection
