@@ -104,7 +104,7 @@ class DebugVisualizer:
         overlay = frame.copy()
         
         for i, mask in enumerate(masks):
-            if mask is not None:
+            if mask is not None and hasattr(mask, 'shape') and mask.size > 0:
                 color = self.colors[i % len(self.colors)]
                 
                 # Create colored mask

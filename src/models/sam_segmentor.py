@@ -138,7 +138,7 @@ class SAMSegmentor:
         colors = np.random.randint(0, 255, size=(len(masks), 3), dtype=np.uint8)
         
         for i, mask in enumerate(masks):
-            if mask is not None:
+            if mask is not None and hasattr(mask, 'shape') and mask.size > 0:
                 color = colors[i].tolist()
                 
                 # Create colored mask
